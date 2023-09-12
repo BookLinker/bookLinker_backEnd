@@ -1,4 +1,4 @@
-package com.books_recommend.book_recommend.common.security;
+package com.books_recommend.book_recommend.common.auth.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
