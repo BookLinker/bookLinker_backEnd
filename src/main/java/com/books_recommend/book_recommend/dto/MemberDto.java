@@ -2,16 +2,18 @@ package com.books_recommend.book_recommend.dto;
 
 import com.books_recommend.book_recommend.entity.Member;
 
+import java.util.List;
+
 public record MemberDto (
     Long id,
     String nickName,
-    Member.MemberStatus status
+    List<String> roles
     ){
     public static MemberDto fromEntity(Member member){
         return new MemberDto(
                 member.getId(),
                 member.getNickName(),
-                member.getStatus()
+                member.getRoles()
         );
     }
 }

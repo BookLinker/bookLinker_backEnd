@@ -7,6 +7,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -29,12 +30,16 @@ public class Member extends BaseTimeEntity {
     @Column
     private String password;
 
-    @Enumerated(value = EnumType.STRING)
-    @Column
-    private MemberStatus status;
+//    @Enumerated(value = EnumType.STRING)
+//    @Column
+//    private MemberStatus status;
 
     @Column
     private LocalDateTime deletedAt;
+
+    //role
+    @ElementCollection(fetch = FetchType.EAGER)
+    private List<String> roles = new ArrayList<>();
 
     @JsonIgnore
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
@@ -50,22 +55,24 @@ public class Member extends BaseTimeEntity {
 //    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
 //    private List<KakaoBookList> KakaoBookLists = new ArrayList<>();
 
-    @Getter
-    @RequiredArgsConstructor
-    public enum MemberStatus {
-        USER("일반회원"),
-        ADMIN("관리자");
-
-        private final String status;
-    }
+//    @Getter
+//    @RequiredArgsConstructor
+//    public enum MemberStatus {
+//        USER("일반회원"),
+//        ADMIN("관리자");
+//
+//        private final String status;
+//    }
 
     public Member(String email,
                   String nickName,
-                  String password) {
+                  String password,
+                  List<String> roles
+                  ) {
         this.email = email;
         this.nickName = nickName;
         this.password = password;
-        this.status = MemberStatus.USER;
+        this.roles = roles;
     }
 
     public void remove(){
@@ -75,5 +82,10 @@ public class Member extends BaseTimeEntity {
     public void addBook(Book book) {
         this.books.add(book);
         book.getMember().getBooks().add(book);
+    }
+
+    //addRole
+    public void addRole(List<String> roles){
+        this.roles = roles;
     }
 }

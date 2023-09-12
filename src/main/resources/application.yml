@@ -19,6 +19,10 @@ spring:
         show_sql: true
         format_sql: true
 
+mail: #관리자 이메일 정보 등록
+  address:
+    admin: ${ADMIN_MAIL}
+
 #h2
 #  h2:
 #    console:

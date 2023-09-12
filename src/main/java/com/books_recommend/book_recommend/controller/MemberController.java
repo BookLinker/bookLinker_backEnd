@@ -4,6 +4,7 @@ import com.books_recommend.book_recommend.common.web.ApiResponse;
 import com.books_recommend.book_recommend.dto.MemberDto;
 import com.books_recommend.book_recommend.service.MemberService;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,6 +27,8 @@ class MemberController {
 
     record Request(
             @NotBlank(message = "email는 필수입니다.")
+            @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+                    , message = "올바른 이메일 형식이 아닙니다.") //이거 안먹힘
             String email,
             @NotBlank(message = "nickname는 필수입니다.")
             String nickname,
