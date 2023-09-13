@@ -21,9 +21,9 @@ class MemberController {
 
     @PostMapping
     ApiResponse<Response> createMember(@Valid @RequestBody Request request){
-        MemberDto memberDto = service.createMember(request.toRequirement());
+        Long savedMember = service.createMember(request.toRequirement());
 
-        Response response =  new Response(memberDto.id());
+        Response response =  new Response(savedMember);
         return ApiResponse.success(response);
     }
 

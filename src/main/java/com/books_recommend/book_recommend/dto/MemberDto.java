@@ -6,14 +6,8 @@ import java.util.List;
 
 public record MemberDto (
     Long id,
+    String email,
     String nickName,
+    String password,
     List<String> roles
-    ){
-    public static MemberDto fromEntity(Member member){
-        return new MemberDto(
-                member.getId(),
-                member.getNickName(),
-                member.getRoles()
-        );
-    }
-}
+    ){}

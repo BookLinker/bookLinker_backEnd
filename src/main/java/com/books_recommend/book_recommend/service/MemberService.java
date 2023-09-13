@@ -18,7 +18,7 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final CustomAuthorityUtils authorityUtils;
 
-    public MemberDto createMember(Requirement requirement){
+    public Long createMember(Requirement requirement){
         var encodedPassword = passwordEncoder.encode(requirement.password);
 
         //사용자의 권한 정보를 생성
@@ -31,9 +31,9 @@ public class MemberService {
             roles
         );
 
-        var saveMember = repository.save(member);
+        var savedMember = repository.save(member);
 
-        return MemberDto.fromEntity(saveMember);
+        return savedMember.getId();
     }
 
     public record Requirement(
