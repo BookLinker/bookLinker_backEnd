@@ -63,14 +63,10 @@ public class SecurityConfiguration {
 
             .csrf((csrf) -> csrf
                 .ignoringRequestMatchers(new AntPathRequestMatcher("/members/**"))) // 회원가입시 막히는 거
-            .csrf((csrf) -> csrf
-                .ignoringRequestMatchers(new AntPathRequestMatcher("/members/login")))
 
             .headers((headers) -> headers
                 .addHeaderWriter(new XFrameOptionsHeaderWriter(
                     XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN)))
-
-
 
             .authorizeHttpRequests(
                 authorize -> authorize
@@ -82,12 +78,7 @@ public class SecurityConfiguration {
                     .requestMatchers("/booklists").permitAll()
                     .requestMatchers("/booklists/search/**").permitAll()
                     .requestMatchers("/books/**").permitAll()
-
             );
-
-
-
-
         return http.build();
     }
 

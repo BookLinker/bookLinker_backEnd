@@ -50,19 +50,5 @@ class MemberController {
     record Response(
             Long id
     ){}
-
-    @PostMapping("/login")
-    ApiResponse<Map<String, String>>login(@RequestBody LoginRequest loginRequest) {
-        var requirement = new MemberService.LoginRequirement(
-            loginRequest.email,
-            loginRequest.password
-        );
-        var info = service.login(requirement);
-        return ApiResponse.success(info);
-    }
-    record LoginRequest(
-        String email,
-        String password
-    ){}
 }
 
