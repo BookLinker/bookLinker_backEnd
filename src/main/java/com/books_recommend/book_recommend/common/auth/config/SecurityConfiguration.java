@@ -1,9 +1,14 @@
 package com.books_recommend.book_recommend.common.auth.config;
 
+import com.books_recommend.book_recommend.common.auth.JwtTokenizer;
+import com.books_recommend.book_recommend.common.auth.filter.JwtAuthenticationFilter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -17,10 +22,41 @@ import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity //모든 요청 url이 springSecurity의 요청을 받도록
+@RequiredArgsConstructor
 public class SecurityConfiguration {
+    private final JwtTokenizer jwtTokenizer;
 
-    @Bean
+//    @Bean //ver1 기본적인 것만 / 에러처리 못함
+//    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+//        http
+//            .csrf((csrf) -> csrf
+//                .ignoringRequestMatchers(new AntPathRequestMatcher("/members/**"))) //회원가입시 막히는 거
+//
+//            .headers((headers) -> headers
+//                .addHeaderWriter(new XFrameOptionsHeaderWriter(
+//                    XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN)))
+//
+//            .authorizeHttpRequests(
+//                authorize -> authorize
+//                    //member
+//                    .requestMatchers("/members/**").permitAll() //.permitAll() 모든 허용
+//                    .requestMatchers("/members/login").permitAll()
+//
+//                    //booksGet
+//                    .requestMatchers("/booklists").permitAll()
+//                    .requestMatchers("/booklists/search/**").permitAll()
+//                    .requestMatchers("/books/**").permitAll()
+//
+//            );
+//
+//        return http.build();
+//    }
+
+    @Bean //ver2 로그인 토큰 인증 추가
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            .apply(new CustomFilterConfigurer());
+
         http
             .csrf((csrf) -> csrf
                 .ignoringRequestMatchers(new AntPathRequestMatcher("/members/**"))) //회원가입시 막히는 거
@@ -35,14 +71,27 @@ public class SecurityConfiguration {
                     .requestMatchers("/members/**").permitAll() //.permitAll() 모든 허용
                     .requestMatchers("/members/login").permitAll()
 
+
                     //booksGet
                     .requestMatchers("/booklists").permitAll()
                     .requestMatchers("/booklists/search/**").permitAll()
                     .requestMatchers("/books/**").permitAll()
 
             );
-
         return http.build();
+    }
+
+    //CustomFilterConfigurer: Configuration 원하는 대로 시큐리티 설정할 수 있는 거
+    public class CustomFilterConfigurer extends AbstractHttpConfigurer<CustomFilterConfigurer, HttpSecurity> {//AbstractHttpConfigurer를 상속해야 CustomFilter~ 구현가능
+        @Override
+        public void configure(HttpSecurity builder) throws Exception {
+            var authenticationManager = builder.getSharedObject(AuthenticationManager.class);  //AuthenticationManager 객체얻기
+
+            JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(authenticationManager, jwtTokenizer);  //AuthenticationManager, JwtTokenizer 의존성 주입
+            jwtAuthenticationFilter.setFilterProcessesUrl("/members/login"); //requestURl 변경
+
+            builder.addFilter(jwtAuthenticationFilter); //addFilter(): JwtAuthenticationFilter를 Spring Security Filter Chain 에 추가
+        }
     }
 
     @Bean //패스워드 암호화 기능을 제공하는 컴포넌트

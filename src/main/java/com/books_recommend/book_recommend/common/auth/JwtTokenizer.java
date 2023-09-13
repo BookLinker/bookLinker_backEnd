@@ -1,10 +1,15 @@
 package com.books_recommend.book_recommend.common.auth;
 
 //토큰을 생성하고 검증하는 클래스
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.io.Encoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.Getter;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
@@ -12,7 +17,20 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 
+@Component
 public class JwtTokenizer {
+    @Getter
+    @Value("${jwt.key}")
+    private String secretKey; //JWT 생성 및 검증 시 사용되는 Secret Key 정보
+
+    @Getter
+    @Value("${jwt.access-token-expiration-minutes}")
+    private int accessTokenExpirationMinutes; // Access Token 만료시간
+
+    @Getter
+    @Value("${jwt.refresh-token-expiration-minutes}")
+    private int refreshTokenExpirationMinutes; //refresh token 만료시간
+
     public String encodeBase64SecretKey(String secretKey) {
         return Encoders.BASE64.encode(secretKey.getBytes(StandardCharsets.UTF_8));
     }
@@ -53,6 +71,7 @@ public class JwtTokenizer {
         return key;
     }
 
+    //단순히 검증하는 용도로 쓰일 경우
     public void verifySignature(String jws, String base64EncodedSecretKey) { //JWT 검증 메소드
         Key key = getKeyFromBase64EncodedKey(base64EncodedSecretKey);
 
@@ -64,4 +83,12 @@ public class JwtTokenizer {
 
     //* Plain Text 자체를 Secret Key로 사용 하는 건 X
     //* jjwt 최신 버전(0.11.5)에서는 서명 과정에서 내부적으로 적절한 HMAC 알고리즘을 지정 (직접지정 X)
+
+    public Date getTokenExpiration(int expirationMinutes) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.MINUTE, expirationMinutes);
+        Date expiration = calendar.getTime();
+
+        return expiration;
+    }
 }

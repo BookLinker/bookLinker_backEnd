@@ -23,6 +23,11 @@ mail: #관리자 이메일 정보 등록
   address:
     admin: ${ADMIN_MAIL}
 
+jwt: #JwtTokenizer
+  key: ${JWT_SECRET_KEY} #내가 지정한 키를 비밀 키로 이용
+  access-token-expiration-minutes: 30
+  refresh-token-expiration-minutes: 420
+
 #h2
 #  h2:
 #    console:
