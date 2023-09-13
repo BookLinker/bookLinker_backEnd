@@ -57,7 +57,6 @@ public class SecurityConfiguration {
     @Bean //ver2 로그인 토큰 인증 추가
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-
             .apply(new CustomFilterConfigurer())
             .and() // CustomFilterConfigurer 설정과 분리
 
@@ -68,16 +67,16 @@ public class SecurityConfiguration {
                 .addHeaderWriter(new XFrameOptionsHeaderWriter(
                     XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN)))
 
+
+
             .authorizeHttpRequests(
                 authorize -> authorize
-                    // member
-                    .requestMatchers("/members/**").permitAll() //.permitAll() 모든 허용
-                    .requestMatchers( "/members/login").permitAll() // POST 요청에 대해 허용
+                    .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
 
-                    // booksGet
-                    .requestMatchers("/booklists").permitAll()
-                    .requestMatchers("/booklists/search/**").permitAll()
-                    .requestMatchers("/books/**").permitAll()
+                    // member
+                    .requestMatchers("/members/**", "/members/login/**", "/booklists", "/booklists/search/**", "/books/**").permitAll() //.permitAll() 모든 허용
+//                    .anyRequest().authenticated()
+                    .anyRequest().permitAll()
             );
         return http.build();
     }
