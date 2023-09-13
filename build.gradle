@@ -50,7 +50,8 @@ dependencies {
 	//springSecurity
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
-	testImplementation 'org.springframework.security:spring=security-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+
 
 	//jjwt
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'

@@ -2,9 +2,11 @@ package com.books_recommend.book_recommend.common.auth.config;
 
 import com.books_recommend.book_recommend.common.auth.JwtTokenizer;
 import com.books_recommend.book_recommend.common.auth.filter.JwtAuthenticationFilter;
+import jakarta.servlet.DispatcherType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -55,29 +57,37 @@ public class SecurityConfiguration {
     @Bean //ver2 로그인 토큰 인증 추가
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .apply(new CustomFilterConfigurer());
 
-        http
+            .apply(new CustomFilterConfigurer())
+            .and() // CustomFilterConfigurer 설정과 분리
+
             .csrf((csrf) -> csrf
-                .ignoringRequestMatchers(new AntPathRequestMatcher("/members/**"))) //회원가입시 막히는 거
+                .ignoringRequestMatchers(new AntPathRequestMatcher("/members/**"))) // 회원가입시 막히는 거
+            .csrf((csrf) -> csrf
+                .ignoringRequestMatchers(new AntPathRequestMatcher("/members/login")))
 
             .headers((headers) -> headers
                 .addHeaderWriter(new XFrameOptionsHeaderWriter(
                     XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN)))
 
+
+
             .authorizeHttpRequests(
                 authorize -> authorize
-                    //member
+                    // member
                     .requestMatchers("/members/**").permitAll() //.permitAll() 모든 허용
-                    .requestMatchers("/members/login").permitAll()
+                    .requestMatchers( "/members/login").permitAll() // POST 요청에 대해 허용
 
-
-                    //booksGet
+                    // booksGet
                     .requestMatchers("/booklists").permitAll()
                     .requestMatchers("/booklists/search/**").permitAll()
                     .requestMatchers("/books/**").permitAll()
 
             );
+
+
+
+
         return http.build();
     }
 

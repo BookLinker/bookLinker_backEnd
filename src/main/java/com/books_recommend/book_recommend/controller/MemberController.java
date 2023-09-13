@@ -1,16 +1,20 @@
 package com.books_recommend.book_recommend.controller;
 
+import com.books_recommend.book_recommend.common.auth.JwtTokenizer;
+import com.books_recommend.book_recommend.common.exception.BusinessLogicException;
+import com.books_recommend.book_recommend.common.exception.ExceptionCode;
 import com.books_recommend.book_recommend.common.web.ApiResponse;
 import com.books_recommend.book_recommend.dto.MemberDto;
 import com.books_recommend.book_recommend.service.MemberService;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/members")
@@ -45,6 +49,20 @@ class MemberController {
     }
     record Response(
             Long id
+    ){}
+
+    @PostMapping("/login")
+    ApiResponse<Map<String, String>>login(@RequestBody LoginRequest loginRequest) {
+        var requirement = new MemberService.LoginRequirement(
+            loginRequest.email,
+            loginRequest.password
+        );
+        var info = service.login(requirement);
+        return ApiResponse.success(info);
+    }
+    record LoginRequest(
+        String email,
+        String password
     ){}
 }
 
