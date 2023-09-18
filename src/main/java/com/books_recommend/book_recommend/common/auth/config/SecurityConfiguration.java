@@ -60,23 +60,28 @@ public class SecurityConfiguration {
             .apply(new CustomFilterConfigurer())
             .and() // CustomFilterConfigurer 설정과 분리
 
-            .csrf((csrf) -> csrf
-                .ignoringRequestMatchers(new AntPathRequestMatcher("/members/**"))) // 회원가입시 막히는 거
+//            .csrf((csrf) -> csrf
+//                .ignoringRequestMatchers(new AntPathRequestMatcher("/members/**"))) // 회원가입시 막히는 거
+            
+            .csrf(AbstractHttpConfigurer::disable)
+            .formLogin(AbstractHttpConfigurer::disable)
+
 
             .headers((headers) -> headers
                 .addHeaderWriter(new XFrameOptionsHeaderWriter(
                     XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN)))
 
-
-
             .authorizeHttpRequests(
                 authorize -> authorize
                     .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
 
-                    // member
+                    // permitAll
                     .requestMatchers("/members/**", "/members/login/**", "/booklists", "/booklists/search/**", "/books/**").permitAll() //.permitAll() 모든 허용
-//                    .anyRequest().authenticated()
-                    .anyRequest().permitAll()
+                    .anyRequest().permitAll() //이거 설정 안하면 403
+
+                    //auth
+                    //.requestMatchers()
+                    //.anyRequest().authenticated() //인증필요
             );
         return http.build();
     }
@@ -103,11 +108,24 @@ public class SecurityConfiguration {
     @Bean// CorsConfigurationSource Bean 생성 > 구체적인 Cors 설정
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
+
+        //ver1
         configuration.setAllowedOrigins(Arrays.asList("*"));   //모든 출처(Origin)에 대해 스크립트 기반의 HTTP 통신을 허용
         configuration.setAllowedMethods(Arrays.asList("GET","POST", "PATCH", "DELETE"));  //파라미터로 지정한 HTTP Method에 대한 HTTP 통신을 허용
+
+//        configuration.addAllowedOriginPattern("*");
+//        configuration.addAllowedHeader("*");
+//        configuration.addAllowedMethod("*");
+//        configuration.addExposedHeader("authorization");
+//        configuration.addExposedHeader("refresh");
+//        configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();   //CorsConfigurationSource 구현 클래스 생성
         source.registerCorsConfiguration("/**", configuration); //모든 URL에 앞에서 구성한 CORS 정책 적용
         return source;
     }
+
+    //Using generated security password:
+        //ㄴ> 993293a0-61e7-45dc-8cce-9070294f9eb2 비밀번호가 뜸 > 인증을 해주어야 한다는 거임!!!!!!!!!!!
+    //인증을 끄던가 인증을 하던가 !!!!! 필터 / 핸들러쪽
 }

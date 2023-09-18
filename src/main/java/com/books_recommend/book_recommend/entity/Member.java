@@ -88,4 +88,6 @@ public class Member extends BaseTimeEntity {
     public void addRole(List<String> roles){
         this.roles = roles;
     }
+
+
 }

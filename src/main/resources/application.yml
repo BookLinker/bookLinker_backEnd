@@ -47,4 +47,3 @@ jwt: #JwtTokenizer
 
 kakao:
   key: ${KAKAO_KEY}
-
